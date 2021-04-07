@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script type="text/javascript" src="/jquery-3.1.1.min.js"></script>
+</head>
+<body>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">名称</th>
+        <th scope="col">类型</th>
+        <th scope="col">图片</th>
+        <th scope="col">价格</th>
+        <th scope="col">说明</th>
+        <th scope="col">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item,userStat : ${list}">
+        <th scope="row" th:text="${userStat.count}"></th>
+        <td th:text="${item.name}"></td>
+        <td th:text="${item.type}"></td>
+        <td><img   th:src="${item.pictures[0]}" height="30px" width="30px"></td>
+        <td th:text="${item.price}"></td>
+        <td th:text="${item.comment}"></td>
+        <td>
+            <a th:href="'/share/commodity/view/'+${item.id}"  class="btn btn-primary" >查看</a>
+            <button type="button" class="btn btn-danger" th:onclick='deleteCom([[${item.id}]])'>删除商品</button>
+        </td>
+    </tr>
+
+    </tbody>
+</table>
+<script>
+    function deleteCom(id) {
+        $.ajax({
+            type:"POST",
+            url:"/admin/manage/commodity/delete/"+id,
+            // contentType: "application/json", //必须这样写
+            // dataType:"json",
+            // data:JSON.stringify(schoolList),//schoolList是你要提交是json字符串
+            success:function (data) {
+                console.log(data)
+                window.location.href = '/admin/manage/commodity'
+            }
+        })
+    }
+</script>
+</body>
+</html>

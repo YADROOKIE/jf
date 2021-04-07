@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/my.css">
+
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow rounded fixed-top" >
+    <div class="mx-auto d-flex justify-content-between" style="width: 60%;" >
+        <a class="navbar-brand " href="/">Share</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent" style="display:flex;justify-content: space-between">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">首页 <span class="sr-only">(current)</span></a>
+                </li>
+
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                <ul class="navbar-nav mr-auto ml-2" th:if="${user} eq null">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/share/base-user/login.html">登录</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/share/base-user/register">注册</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav mr-auto ml-10" th:else  >
+                    <li><div style="width: 20px;"></div></li>
+                    <li class="nav-item">
+                        <img th:if="${user} ne null"  th:src="${user.avatar}" height="30px" width="30px" onclick="person()" id="box">
+                    </li>
+                    <li class="nav-item">
+                        <div class="dropdown">
+                            <button class="btn-sm btn-outline-info dropdown-toggle" type="button"  th:if="${user} ne null" th:text="${user.name}"
+                                    id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" th:if="${user} ne null">
+                                <a class="dropdown-item" href="/share/base-user/person">个人资料</a>
+                                <a class="dropdown-item" href="/share/commodity/view/add">发布物品</a>
+                                <a class="dropdown-item" th:href="'/share/commodity/view/user/publish/'+${user.id}">我的发布</a>
+                                <a class="dropdown-item" th:href="'/share/user-com-collection/user/collection/'">购物车</a>
+                                <a class="dropdown-item" href="/share/commodity/uc-order/list">我的订单</a>
+                                <a class="dropdown-item" href="/share/base-user/logout">退出登录</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </form>
+
+        </div>
+    </div>
+</nav>
+
+<div style="height: 70px;"></div>
+<!-- Button trigger modal -->
+<button id="show" type="button" class="btn btn-primary" data-toggle="modal" data-target="#staticBackdrop" style="display:none;">
+    Launch static backdrop modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">评论</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="closeContent">
+                <input type="text" id="reply" placeholder="评论内容">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" >取消</button>
+                <button type="button" class="btn btn-primary" onclick="ok()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="body w-100 " >
+    <div class="mx-auto " style="width: 60%;height: 100%;display: flex;flex-wrap: wrap;justify-content: space-around" >
+        <ul class="list-group" style="width: 80%;display: flex;" >
+            <li class="list-group-item " th:each="item,state : ${list}">
+                <div style="display: flex;">
+                    物品名:<p th:text="${item.commodity.name}"></p>
+                    数量:<p th:text="${item.count}"></p>
+                    总价:<p th:text="${item.price}"></p>
+                </div>
+                <div>创建时间:<p th:text="${item.createAt}"></p></div>
+                <button type="button" class="btn btn-success" th:onclick="info([[${item.commodity.id}]])">查看</button>
+                <button type="button" class="btn btn-info"  th:onclick="reply([[${item.commodity.id}]])">评价</button>
+            </li>
+            <li class="list-group-item align-content-center" th:if="${list.size == 0 }" >
+                还没有任何订单哦~~~~
+            </li>
+        </ul>
+    </div>
+</div>
+<script>
+    function info(id) {
+        window.location.href = '/share/commodity/view/'+id
+    }
+    var curr = ''
+    function reply(id) {
+        curr = id
+        document.getElementById("show").click()
+    }
+    function ok() {
+        if (curr==''){
+            return;
+        }
+        var reply = {
+            commodityId:curr,
+            content:document.getElementById("reply").value
+        }
+        $.ajax({
+            type:'POST',
+            url:'/share/commodity-reply/add',
+            contentType: "application/json", //必须这样写
+            dataType:"json",
+            data:JSON.stringify(reply),//schoolList是你要提交是json字符串
+            success:function(data){
+                window.location.href = '/share/commodity/view/'+curr
+            }
+        })
+    }
+</script>
+</body>
+</html>

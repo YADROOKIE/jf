@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ari-Blog</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script type="text/javascript" src="/jquery-3.1.1.min.js"></script>
+</head>
+
+<body class="bg-light">
+<div class="w-100 h-100">
+    <div class="shadow-sm bg-white p-4" style="width:20%;position: fixed;top: 20%;left: 40%;">
+
+            <div class="form-group">
+                <div class="warp-content">头像</div>
+                <img id="image" height="120px" th:src="${user.avatar}">
+                <input type="file" id="file-input" name="fileContent">
+            </div>
+            <div class="form-group">
+                <label >学号</label>
+                <input type="text" class="form-control" name="stuNo" id="stuNo" th:value="${user.stuNo}" readonly="readonly">
+            </div>
+            <div class="form-group">
+                <label >名称</label>
+                <input type="text" class="form-control" name="name" id="name" th:value="${user.name}">
+            </div>
+            <div class="form-group">
+                <label >年龄</label>
+                <input type="text" class="form-control" name="age" id="age" th:value="${user.age}">
+            </div>
+<!--            <div class="form-group">-->
+<!--                <label for="exampleInputPassword1">密码</label>-->
+<!--                <input type="password" class="form-control" id="exampleInputPassword1" name="password">-->
+<!--            </div>-->
+            <button type="submit" class="btn btn-primary" onclick="updateInfo()">修改</button>
+
+    </div>
+</div>
+<script th:inline="javascript" >
+
+    var fileInput = document.querySelector('#file-input');
+    var img =  [[${user.avatar}]]
+    var id = [[${user.id}]]
+    var stuNo = [[${user.stuNo}]]
+    var age = [[${user.age}]]
+    var name = [[${user.name}]]
+    function updateInfo(){
+        stuNo = document.getElementById("stuNo").value
+        name = document.getElementById("name").value
+        age = document.getElementById("age").value
+        var formdata = {
+            id:id,
+            avatar:img,
+            stuNo:stuNo,
+            age:age,
+            name:name
+        }
+        console.log(formdata)
+        $.ajax({
+            type:"POST",
+            url:"/share/base-user/rest/update",
+            contentType: "application/json", //必须这样写
+            dataType:"json",
+            data:JSON.stringify(formdata),//schoolList是你要提交是json字符串
+            success:function (data) {
+                console.log(data)
+                window.location.href = '/'
+            }
+        })
+    }
+
+    fileInput.onchange = function(){
+        var files = this.files
+        if(files.length == 0) return;
+        var form = new FormData(),
+            url = 'https://www.yangdd.club/oss/fileoss/img', //服务器上传地址
+            file = files[0];
+        form.append('file', file);
+        var xhr = new XMLHttpRequest();
+        xhr.open("post", url, true);
+        //上传进度事件
+        xhr.upload.addEventListener("progress", function(result) {
+            if (result.lengthComputable) {
+                //上传进度
+                var percent = (result.loaded / result.total * 100).toFixed(2);
+                console.log(percent)
+            }
+        }, false);
+
+        xhr.addEventListener("readystatechange", function() {
+            var result = xhr;
+            if (result.status != 200) { //error
+                console.log('上传失败', result.status, result.statusText, result.response);
+            }
+            else if (result.readyState == 4) { //finished
+                console.log('上传成功', result);
+                var r = JSON.parse(result.responseText)
+                if(r.code==20000){
+
+                    img = r.data.url
+                    console.log(img)
+                    document.getElementById("image").src = img
+                }
+            }
+        });
+        xhr.send(form); //开始上传
+    }
+</script>
+</body>
+</html>

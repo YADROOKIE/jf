@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script type="text/javascript" src="/jquery-3.1.1.min.js"></script>
+</head>
+<body>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">名称</th>
+        <th scope="col">年龄</th>
+        <th scope="col">头像</th>
+        <th scope="col">学号</th>
+        <th scope="col">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user,userStat : ${list}">
+        <th scope="row" th:text="${userStat.count}"></th>
+        <td th:text="${user.name}"></td>
+        <td th:text="${user.age}"></td>
+        <td><img   th:src="${user.avatar}" height="30px" width="30px"></td>
+        <td th:text="${user.stuNo}"></td>
+        <td>
+            <button type="button" class="btn btn-danger" th:onclick='deleteUser([[${user.id}]])'>删除用户</button>
+        </td>
+    </tr>
+
+    </tbody>
+</table>
+<script>
+    function deleteUser(id) {
+        $.ajax({
+            type:"POST",
+            url:"/admin/manage/user/delete/"+id,
+            // contentType: "application/json", //必须这样写
+            // dataType:"json",
+            // data:JSON.stringify(schoolList),//schoolList是你要提交是json字符串
+            success:function (data) {
+                console.log(data)
+                window.location.href = '/admin/manage/user'
+
+            }
+        })
+    }
+</script>
+</body>
+</html>

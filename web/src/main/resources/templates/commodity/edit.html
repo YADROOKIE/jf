@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="/jquery-3.1.1.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body style="padding-top: 10%">
+<div class="mx-auto" style="width: 60%;">
+    <div class="warp-content">封面</div>
+        <img id="image" height="120px" th:src="${cds.pictures[0]}">
+        <input type="file" id="file-input" name="fileContent">
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" >名称</span>
+            </div>
+            <input id="name" type="text" class="form-control" placeholder=""  th:value="${cds.name}">
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+            <span class="input-group-text" >类型</span>
+        </div>
+        <input id="type" type="text" class="form-control" placeholder=""   th:value="${cds.type}">
+    </div>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text">数量</span>
+            <span class="input-group-text">/</span>
+        </div>
+        <input id="count" type="text" class="form-control" name="count"  th:value="${cds.count}">
+    </div>
+
+    <div class="input-group mb-3" style="width: 50%">
+        <div class="input-group-prepend">
+            <span class="input-group-text">价格</span>
+        </div>
+        <input id="price" type="text" class="form-control"   th:value="${cds.price}" >
+    </div>
+
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text">物品说明</span>
+        </div>
+        <textarea id="comment" class="form-control"   th:text="${cds.comment}" ></textarea>
+    </div>
+    <div class="mx-auto" >
+        <button type="button" class="btn btn-success mx-auto" onclick="update()">更新</button>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    function update() {
+        let data = formData();
+        console.log(data)
+        $.ajax({
+            type:"POST",
+            url:"/share/commodity/rest/update",
+            contentType: "application/json", //必须这样写
+            dataType:"json",
+            data:JSON.stringify(data),//schoolList是你要提交是json字符串
+            success:function (data) {
+                console.log(data)
+                window.location.href = '/'
+            }
+        })
+    }
+    function formData() {
+        var name =   document.getElementById("name").value
+        var count =  document.getElementById("count").value
+        var price = document.getElementById("price").value
+        var type = document.getElementById("type").value
+        var id = [[${cds.id}]]
+        var comment = document.getElementById("comment").value
+
+        var pictures = [img]
+        return {
+            id,name,type,count,price,comment,pictures
+        }
+    }
+
+    var fileInput = document.querySelector('#file-input');
+    var img = document.getElementById("image").src
+    fileInput.onchange = function(){
+        var files = this.files
+        if(files.length == 0) return;
+        var form = new FormData(),
+            url = 'https://www.yangdd.club/oss/fileoss/img', //服务器上传地址
+            file = files[0];
+        form.append('file', file);
+        var xhr = new XMLHttpRequest();
+        xhr.open("post", url, true);
+        //上传进度事件
+        xhr.upload.addEventListener("progress", function(result) {
+            if (result.lengthComputable) {
+                //上传进度
+                var percent = (result.loaded / result.total * 100).toFixed(2);
+                console.log(percent)
+            }
+        }, false);
+
+        xhr.addEventListener("readystatechange", function() {
+            var result = xhr;
+            if (result.status != 200) { //error
+                console.log('上传失败', result.status, result.statusText, result.response);
+            }
+            else if (result.readyState == 4) { //finished
+                console.log('上传成功', result);
+                var r = JSON.parse(result.responseText)
+                if(r.code==20000){
+                    img = r.data.url
+                    console.log(img)
+                    document.getElementById("image").src = img
+                }
+            }
+        });
+        xhr.send(form); //开始上传
+    }
+</script>
+</body>
+</html>

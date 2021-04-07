@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/my.css">
+
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow rounded fixed-top" >
+    <div class="mx-auto d-flex justify-content-between" style="width: 60%;" >
+        <a class="navbar-brand " href="/">Share</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent" style="display:flex;justify-content: space-between">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">首页 <span class="sr-only">(current)</span></a>
+                </li>
+
+            </ul>
+            <div class="form-inline my-2 my-lg-0">
+                <input id="search" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0"  onclick="search()">搜索</button>
+                <ul class="navbar-nav mr-auto ml-2" th:if="${user} eq null">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/share/base-user/login.html">登录</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/share/base-user/register">注册</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav mr-auto ml-10" th:else  >
+                    <li><div style="width: 20px;"></div></li>
+                    <li class="nav-item">
+                        <img th:if="${user} ne null"  th:src="${user.avatar}" height="30px" width="30px" onclick="person()" id="box">
+                    </li>
+                    <li class="nav-item">
+                        <div class="dropdown">
+                            <button class="btn-sm btn-outline-info dropdown-toggle" type="button"  th:if="${user} ne null" th:text="${user.name}"
+                                    id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" th:if="${user} ne null">
+                                <a class="dropdown-item" href="/share/base-user/person">个人资料</a>
+                                <a class="dropdown-item" href="/share/commodity/view/add">发布物品</a>
+                                <a class="dropdown-item" th:href="'/share/commodity/view/user/publish/'+${user.id}">我的发布</a>
+                                <a class="dropdown-item" th:href="'/share/user-com-collection/user/collection/'">购物车</a>
+                                <a class="dropdown-item" href="/share/commodity/uc-order/list">我的订单</a>
+                                <a class="dropdown-item" href="/file/">我的网盘</a>
+                                <a class="dropdown-item" href="/share/base-user/logout">退出登录</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</nav>
+
+
+<div style="height: 70px;"></div>
+
+<div class="body w-100 " >
+
+    <div class="mx-auto " style="width: 60%;height: 100%;display: flex;flex-wrap: wrap;justify-content: space-around" >
+
+        <div class="card m-2" style="width: 14rem;" th:each="item,state : ${list}">
+            <img th:src="${item.pictures[0]}" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title" th:text="${item.name}"></h5>
+                <p class="card-text" th:text="'说明:'+${item.comment}"></p>
+                <p>价格:<span th:text="${item.price}"></span></p>
+                <p>库存:<span th:text="${item.count}"></span></p>
+                <a th:href="'/share/commodity/view/'+${item.id}"  class="btn btn-primary" >查看</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="foot w-100">
+    <div class="mx-auto " style="width: 60%;height: 70px;">
+        <div class=" mx-auto mt-2 " style="width: 80%;">
+            <p><a href="/admin">admin</a></p>
+
+        </div>
+    </div>
+</div>
+</body>
+
+<script>
+    function person() {
+        window.location.href = '/share/base-user/person'
+    }
+
+    function search() {
+        var key = document.getElementById("search").value
+        console.log(key)
+        if (key!=''){
+            window.location.href = '/search/'+key
+        }
+
+    }
+</script>
+
+</html>

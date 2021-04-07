@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ari-Blog</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+</head>
+
+<body class="bg-light">
+<div class="w-100 h-100">
+    <div class="shadow-sm bg-white p-4" style="width:20%;position: fixed;top: 30%;left: 40%;">
+        <div>管理员登录</div>
+        <form action="/admin/login" method="post">
+            <div class="form-group">
+                <label >账号</label>
+                <input type="text" class="form-control" name="username">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">密码</label>
+                <input type="password" class="form-control" id="exampleInputPassword1" name="password">
+            </div>
+            <button type="submit" class="btn btn-primary">登录</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

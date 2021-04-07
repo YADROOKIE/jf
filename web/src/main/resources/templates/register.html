@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ari-Blog</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+</head>
+
+<body class="bg-light">
+<div class="w-100 h-100">
+    <div class="shadow-sm bg-white p-4" style="width:20%;position: fixed;top: 30%;left: 40%;">
+        <form action="/share/base-user/register" method="post">
+            <div class="form-group">
+                <label >学号</label>
+                <input type="text" class="form-control" name="stuNo">
+            </div>
+            <div class="form-group">
+                <label >名称</label>
+                <input type="text" class="form-control" name="name">
+            </div>
+            <div class="form-group">
+                <label >年龄</label>
+                <input type="text" class="form-control" name="age">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">密码</label>
+                <input type="password" class="form-control" id="exampleInputPassword1" name="password">
+            </div>
+            <button type="submit" class="btn btn-primary">注册</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

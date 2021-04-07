@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/my.css">
+
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow rounded fixed-top" >
+    <div class="mx-auto d-flex justify-content-between" style="width: 60%;" >
+        <a class="navbar-brand " href="/">Share</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent" style="display:flex;justify-content: space-between">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">首页 <span class="sr-only">(current)</span></a>
+                </li>
+
+            </ul>
+            <div class="form-inline my-2 my-lg-0">
+                <input id="search" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0"  onclick="search()">搜索</button>
+                <ul class="navbar-nav mr-auto ml-2" th:if="${user} eq null">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/share/base-user/login.html">登录</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/share/base-user/register">注册</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav mr-auto ml-10" th:else  >
+                    <li><div style="width: 20px;"></div></li>
+                    <li class="nav-item">
+                        <img th:if="${user} ne null"  th:src="${user.avatar}" height="30px" width="30px" onclick="person()" id="box">
+                    </li>
+                    <li class="nav-item">
+                        <div class="dropdown">
+                            <button class="btn-sm btn-outline-info dropdown-toggle" type="button"  th:if="${user} ne null" th:text="${user.name}"
+                                    id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" th:if="${user} ne null">
+                                <a class="dropdown-item" href="/share/base-user/person">个人资料</a>
+                                <a class="dropdown-item" href="/share/commodity/view/add">发布物品</a>
+                                <a class="dropdown-item" th:href="'/share/commodity/view/user/publish/'+${user.id}">我的发布</a>
+                                <a class="dropdown-item" th:href="'/share/user-com-collection/user/collection/'">购物车</a>
+                                <a class="dropdown-item" href="/share/commodity/uc-order/list">我的订单</a>
+                                <a class="dropdown-item" href="/file/">我的网盘</a>
+                                <a class="dropdown-item" href="/share/base-user/logout">退出登录</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</nav>
+
+
+<div style="height: 70px;"></div>
+<!-- Button trigger modal -->
+<button id="show" type="button" class="btn btn-primary" data-toggle="modal" data-target="#staticBackdrop" style="display:none;">
+    Launch static backdrop modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">新建文件夹</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="closeContent">
+                <input type="text" id="reply" placeholder="名称">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" >取消</button>
+                <button type="button" class="btn btn-primary" onclick="ok()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="body w-100 " >
+
+    <div class="mx-auto " style="width: 60%;height: 100%;display: flex;flex-wrap: wrap;justify-content: space-around" >
+        <ul class="list-group" style="width: 80%">
+            <li class="list-group "  style="display:flex; " >
+                <a href="/file/">根目录</a>
+                <span th:text="${root.name}"></span>
+            </li>
+            <div id="dd" th:text="${root.id}" style="display: none"></div>
+            <li class="list-group">
+                <button type="button" class="btn btn-outline-info " th:onclick="createFolder([[${root.id}]])">创建文件夹</button>
+                <input type="file" id="file-input" name="fileContent" class="btn btn-outline-info"  >
+            </li>
+
+            <li class="list-group-item f" th:each="item,state : ${root.children}" >
+                <a th:if="${item.type=='file'}" th:text="${item.name}"   th:href="@{'/file/user/get/'+${item.id}}" class="badge badge-light"  ></a>
+                <a th:if="${item.type=='folder'}" th:text="${item.name}" href="#" class="badge badge-secondary" th:onclick="toFolder([[${item.id}]])" ></a>
+            </li>
+        </ul>
+
+    </div>
+</div>
+
+
+</body>
+
+<script>
+    function person() {
+        window.location.href = '/share/base-user/person'
+    }
+
+    function search() {
+        var key = document.getElementById("search").value
+        console.log(key)
+        if (key!=''){
+            window.location.href = '/search/'+key
+        }
+
+    }
+    var curr = ''
+    function createFolder(id) {
+        curr = id
+        document.getElementById("show").click()
+    }
+    function download(id) {
+        window.location.href = '/file/user/get/'+id
+    }
+    function toFolder(id) {
+        window.location.href = '/file/'+id
+    }
+
+    function ok() {
+        if (curr==''){
+            return;
+        }
+
+        var content = document.getElementById("reply").value
+        $.ajax({
+            type:'POST',
+            url:'/file/user/folder/'+curr+'/'+content,
+
+            success:function(data){
+                if (data.code == 20001){
+                    window.location.href = '/share/base-user/login.html'
+                }else {
+                    window.location.href = '/file/'
+                }
+            }
+        })
+    }
+    var fileInput = document.querySelector('#file-input');
+
+    fileInput.onchange = function(){
+        var files = this.files
+        var id = document.getElementById("dd").innerText
+        if(files.length == 0) return;
+        var form = new FormData(),
+            url = 'http://localhost:8080/file/user/upload/'+id, //服务器上传地址
+            file = files[0];
+        form.append('file', file);
+        var xhr = new XMLHttpRequest();
+        xhr.open("post", url, true);
+        //上传进度事件
+        xhr.upload.addEventListener("progress", function(result) {
+            if (result.lengthComputable) {
+                //上传进度
+                var percent = (result.loaded / result.total * 100).toFixed(2);
+                console.log(percent)
+            }
+        }, false);
+
+        xhr.addEventListener("readystatechange", function() {
+            var result = xhr;
+            if (result.status != 200) { //error
+                console.log('上传失败', result.status, result.statusText, result.response);
+            }
+            else if (result.readyState == 4) { //finished
+                console.log('上传成功', result);
+                var r = JSON.parse(result.responseText)
+                if(r.code==20000){
+                    window.location.href = '/file/'
+                }else{
+
+                }
+
+            }
+        });
+        xhr.send(form); //开始上传
+    }
+</script>
+
+</html>
